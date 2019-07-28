@@ -16,18 +16,18 @@ var personnelSchema = new Schema({
     locationCountry: String,
     locationLocal: String,
     // ----------------------------------------
-    addressStreet: String,
-    addressCity: String,
-    addressRegion: String,
-    addressCountry: String,
-    addressPostal: String,
-    photo: String, // URL to photo
-    citizenship: String,
-    passportNumber: String,
-    passportPhoto: String, // URL to photo
-    documents: [String], // array of URL to documents, visa, flights, etc
-    financialCards: [String],
-    medical: String,
+    // addressStreet: String,
+    // addressCity: String,
+    // addressRegion: String,
+    // addressCountry: String,
+    // addressPostal: String,
+    // photo: String, // URL to photo
+    // citizenship: String,
+    // passportNumber: String,
+    // passportPhoto: String, // URL to photo
+    // documents: [String], // array of URL to documents, visa, flights, etc
+    // financialCards: [String],
+    // medical: String,
 });
 
 module.exports = personnelSchema;

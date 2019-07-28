@@ -1,17 +1,15 @@
 const mongoose = require('mongoose');
 
-const textContentSchema = require('../schemas/text-content');
-//const mediaContentSchema = require('../schemas/media-content');
+const contentSchema = require('../schemas/mdl-content');
 
 module.exports = function () {
     let db = mongoose.connection;
-    let TextContent = db.model('text-content', textContentSchema, 'text-content');
-    //let MediaContent;
+    let Content = db.model('content', contentSchema, 'content');
 
     return {
         getAll: function () {
 			return new Promise((resolve, reject) => {
-				TextContent.find()
+				Content.find()
 					.sort({ timestamp: 'desc' })
 					.exec((error, items) => {
 						if (error) {
@@ -32,7 +30,7 @@ module.exports = function () {
 				// may change to userData.condition, depends on frontend logic
 				let filter = userData;
 				// let filter = userData.condition;
-				TextContent.find(filter)
+				Content.find(filter)
 					//.sort()
 					.exec((error, items) => {
 						if (error) {
@@ -51,7 +49,7 @@ module.exports = function () {
         
         getOne: function (contentId) {
 			return new Promise((resolve, reject) => {
-				TextContent.findById(contentId, (error, item) => {
+				Content.findById(contentId, (error, item) => {
 					if (error) {
 						return reject({'message' : error.message});
 					}
@@ -67,8 +65,8 @@ module.exports = function () {
 		add: function (data) {
 			return new Promise((resolve, reject) => {
 				// TODO: add new content object checks here
-				let newContent = new TextContent(data);
-				TextContent.create(newContent,
+				let newContent = new Content(data);
+				Content.create(newContent,
 					(error, item) => {
 					if (error) {
 						if (error.code == 11000) {
@@ -85,7 +83,7 @@ module.exports = function () {
 
 		edit: function (data) {
 			return new Promise((resolve, reject) => {
-				TextContent.findByIdAndUpdate(
+				Content.findByIdAndUpdate(
 					data._id,
 					data,
 					{ new: true },
@@ -105,7 +103,7 @@ module.exports = function () {
 
 		delete: function (id) {
 			return new Promise((resolve, reject) => {
-				TextContent.findByIdAndRemove(id,
+				Content.findByIdAndRemove(id,
 					(error) => {
 						if (error) {
 							return reject(`Unable to deactivate content - ${error.message}`);
