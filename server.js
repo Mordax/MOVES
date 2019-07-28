@@ -19,7 +19,19 @@ const HTTP_PORT = process.env.PORT || 9128;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Auth
+// Template ======= generate usage
+var hbs = require('express-handlebars');
+app.set('view engine', 'hbs');
+app.engine('.hbs', hbs({
+	extname: '.hbs',
+	helpers: {
+		json: (context) => {
+			return context == null ? "" : ((context.constructor === Array || context.constructor === Object) ? JSON.stringify(context, null, 2) : context);
+		}
+	}
+}));
+
+// =========================================== Auth setting START ============================================
 var passport = require('passport');
 var passportJWT = require('passport-jwt');
 
@@ -27,10 +39,12 @@ var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
 
 var jwtOptions = {};
-jwtOptions.issuer = 'groupA.dps945.com';
-//jwtOptions.passReqToCallback = true;
-jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderWithScheme("jwt");
 
+// Add "Authorization" : "BEARER ${Token}" to Header to test in Postman
+//	Token is obtained from previous login request
+jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
+
+jwtOptions.issuer = utils.JWTISSUER;
 jwtOptions.secretOrKey = utils.JWTSECRET;
 
 var loggedInStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
@@ -43,6 +57,7 @@ var loggedInStrategy = new JwtStrategy(jwtOptions, (jwt_payload, next) => {
 
 passport.use(loggedInStrategy);
 app.use(passport.initialize());
+// ============================================ Auth setting END ============================================
 
 // apply the routes
 app.use(utils.ROUTES.USER_ACCOUNT.BASE_ROUTE , _userAccount);
@@ -50,8 +65,10 @@ app.use(utils.ROUTES.CONTENT.BASE_ROUTE, _content);
 app.use(utils.ROUTES.PERSONNEL.BASE_ROUTE, _personnel);
 app.use(utils.ROUTES.ANNOUNCEMENT.BASE_ROUTE, _announcement);
 
+// send the usage file
+const usageData = require('./usage.json');
 app.get("/", (req, res) => {
-	res.sendFile(path.join(__dirname, "views/usage.html"));
+	res.render('usage', {layout: false, data: usageData})
 });
 
 app.use((req, res) => {

@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var textContentSchema = new Schema({
     slug: String,
     language: String,
-    timestamp: Date,
+    timestamp: String,
     visibility: {
         type: [String],
         default: []

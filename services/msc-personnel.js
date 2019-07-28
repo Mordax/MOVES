@@ -8,7 +8,7 @@ module.exports = function () {
 	let Personnel = db.model('personnel', personnelSchema, 'personnel');
 
 	return {
-		getAll: function (userData) {
+		getAll: function () {
 			return new Promise((resolve, reject) => {
 				Personnel.find()
 					.sort({ familyName: 'asc', givenName: 'asc' })
@@ -66,7 +66,9 @@ module.exports = function () {
 			return new Promise((resolve, reject) => {
 				// TODO: add new personnel object checks here
 				let newPersonnel = new Personnel(userData);
-				newPersonnel.save((error) => {
+				Personnel.create(
+					newPersonnel,
+					(error, item) => {
 					if (error) {
 						if (error.code == 11000) {
 							return reject("Personnel already exists");
@@ -74,7 +76,7 @@ module.exports = function () {
 							return reject(`Personnel creation failed - ${error.message}`);
 						}
 					} else {
-						return resolve("Added new personnel");
+						return resolve(item);
 					}
 				});
 			});
@@ -82,8 +84,8 @@ module.exports = function () {
 
 		edit: function (userData) {
 			return new Promise((resolve, reject) => {
-				Personnel.findOneAndUpdate(
-					{ userName: userData.userName },
+				Personnel.findByIdAndUpdate(
+					userData._id,
 					userData,
 					{ new: true },
 					(error, item) => {
@@ -100,10 +102,10 @@ module.exports = function () {
 			});
 		},
 
-		deleteOrDeactivate: function (userData) {
+		deactivate: function (userData) {
 			return new Promise((resolve, reject) => {
-				Personnel.findOneAndUpdate(
-					{ userName: userData.userName },
+				Personnel.findByIdAndUpdate(
+					userData._id,
 					{ dateTermination: new Date().toISOString() },
 					{ new: true },
 					(error, item) => {
@@ -111,7 +113,7 @@ module.exports = function () {
 							return reject(`Unable to deactivate personnel - ${error.message}`);
 						}
 						if (item) {
-							return resolve('Personnel has been deactivated');
+							return resolve();
 						} else {
 							return reject('Cannot deactivate personnel');
 						}

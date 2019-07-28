@@ -24,9 +24,9 @@ module.exports = function () {
 			});
         },
 
-        getByFilter: (userData) => {
+        getByFilter: (data) => {
             return new Promise( (resolve, reject) => {
-                let filter = userData;
+                let filter = data;
 				// let filter = userData.condition;
 				Announcement.find(filter)
 					//.sort()
@@ -44,9 +44,9 @@ module.exports = function () {
             });
         },
 
-        getOne: (userData) => {
+        getOne: (id) => {
             return new Promise( (resolve, reject) => {
-                Announcement.findById(userId, (error, item) => {
+                Announcement.findById(id, (error, item) => {
 					if (error) {
 						return reject({'message' : error.message});
 					}
@@ -59,10 +59,11 @@ module.exports = function () {
             });
         },
 
-        add: (userData) => {
+        add: (data) => {
             return new Promise( (resolve, reject) => {
-                let newAnnouncement = new Announcement(userData);
-				newAnnouncement.save((error) => {
+				let newAnnouncement = new Announcement(data);
+				Announcement.create(newAnnouncement,
+					(error, item) => {
 					if (error) {
 						if (error.code == 11000) {
 							return reject("Announcement already exists");
@@ -70,17 +71,17 @@ module.exports = function () {
 							return reject(`Announcement creation failed - ${error.message}`);
 						}
 					} else {
-						return resolve("Added new announcement");
+						return resolve(item);
 					}
 				});
             });
         },
 
-        edit: (userData) => {
+        edit: (data) => {
             return new Promise( (resolve, reject) => {
-                Announcement.findOneAndUpdate(
-					{ userName: userData.shortName },
-					userData,
+                Announcement.findByIdAndUpdate(
+					data._id,
+					data,
 					{ new: true },
 					(error, item) => {
 						if (error) {
@@ -96,21 +97,15 @@ module.exports = function () {
             });
         },
 
-        deleteOrDeactivate: (userData) => {
+        delete: (id) => {
             return new Promise( (resolve, reject) => {
-                Announcement.findOneAndUpdate(
-					{ userName: userData.shortName },
-					{ dateTermination: new Date().toISOString() },
-					{ new: true },
-					(error, item) => {
+                Announcement.findByIdAndRemove(
+					id,
+					(error) => {
 						if (error) {
-							return reject(`Unable to deactivate announcement - ${error.message}`);
+							return reject(`Unable to remove announcement - ${error.message}`);
 						}
-						if (item) {
-							return resolve('Announcement has been deactivated');
-						} else {
-							return reject('Cannot deactivate announcement');
-						}
+						return resolve();
 					}
 				);
             });

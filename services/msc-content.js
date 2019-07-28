@@ -42,7 +42,7 @@ module.exports = function () {
 							// TODO: assume for now that we dont need to format our returns
 							return resolve(items);
 						} else {
-							return reject({'message': 'Can\'t find personnel information with given filters'});
+							return reject({'message': 'Can\'t find content information with given filters'});
 						}
 					})
 
@@ -68,7 +68,8 @@ module.exports = function () {
 			return new Promise((resolve, reject) => {
 				// TODO: add new content object checks here
 				let newContent = new TextContent(data);
-				newContent.save((error) => {
+				TextContent.create(newContent,
+					(error, item) => {
 					if (error) {
 						if (error.code == 11000) {
 							return reject("Content already exists");
@@ -76,7 +77,7 @@ module.exports = function () {
 							return reject(`Content creation failed - ${error.message}`);
 						}
 					} else {
-						return resolve("Added new content");
+						return resolve(item);
 					}
 				})
 			});
@@ -84,39 +85,32 @@ module.exports = function () {
 
 		edit: function (data) {
 			return new Promise((resolve, reject) => {
-				TextContent.findOneAndUpdate(
-					{ userName: data.slug },
+				TextContent.findByIdAndUpdate(
+					data._id,
 					data,
 					{ new: true },
 					(error, item) => {
 						if (error) {
-							return reject(`Unable to edit personnel - ${error.message}`);
+							return reject(`Unable to edit content - ${error.message}`);
 						}
 						if (item) {
-							return resolve('Personnel has been updated successfully');
+							return resolve(item);
 						} else {
-							return reject('Cannot update personnel')
+							return reject('Cannot update content')
 						}
 					}
 				);
 			});
 		},
 
-		deleteOrDeactivate: function (data) {
+		delete: function (id) {
 			return new Promise((resolve, reject) => {
-				TextContent.findOneAndUpdate(
-					{ userName: data.slug },
-					{ dateTermination: new Date().toISOString() },
-					{ new: true },
-					(error, item) => {
+				TextContent.findByIdAndRemove(id,
+					(error) => {
 						if (error) {
 							return reject(`Unable to deactivate content - ${error.message}`);
 						}
-						if (item) {
-							return resolve('Content has been deactivated');
-						} else {
-							return reject('Cannot deactivate content');
-						}
+						return resolve();
 					}
 				);
 			});

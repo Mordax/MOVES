@@ -1,7 +1,4 @@
 const mongoose = require('mongoose');
-// I donno if these 2 are needed yet so I added them
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
 
 const bcrypt = require('bcryptjs');
 
@@ -22,8 +19,7 @@ module.exports = function () {
 				if (userData.password != userData.passwordConfirm) {
 					return reject('Password does not match with confirmted.');
 				}
-
-				/*
+				
 				// User need to have at least 1 claim
 				if (userData.claims.length == 0) {
 					return reject('User need to have at least 1 claim.');
@@ -41,7 +37,7 @@ module.exports = function () {
 						return reject(`Role ${userData.roles[i]} is not supported`);
 					}
 				}
-				*/
+				
 				// If passed user info is correct, salt and hash the password
 				var salt = bcrypt.genSaltSync(10);
 				var hash = bcrypt.hashSync(userData.password, salt);
@@ -62,12 +58,6 @@ module.exports = function () {
 				});
 			});
 		},
-
-		// userAccountActivate: (userData) => {
-		// 	return new Promise((resolve, reject) => {
-
-		// 	});
-		// },
 
 		// userData will include userName field as string
 		userAccountLogin: function (userData) {
@@ -90,6 +80,12 @@ module.exports = function () {
 						}
 					}
 				);
+			});
+		},
+
+		userAccountActivate: function(userData) {
+			return new Promise((resolve, reject) => {
+
 			});
 		},
 
@@ -170,21 +166,36 @@ module.exports = function () {
 			return new Promise((resolve, reject) => {
 				UserAccounts.findOneAndUpdate(
 					{ userName: userData.userName },
-					{ $set: { "roles" : [] }, $set : { "claims" : [] } },
+					{ $set : { "claims" : userData.claims } },
 					{ new: true},
 					(error, item) => {
 						if (error) {
-							return reject(`Unable to clear - ${error.message}`);
+							return reject(`Unable to reset - ${error.message}`);
 						}
 
 						if (item) {
-							return resolve('Roles and claims are successfully cleared.');
+							return resolve('Claims are successfully set to new values.');
 						} else {
-							return reject('Unable to clear.');
+							return reject('Unable to reset.');
 						}
 					}
 				);
 			});
+		},
+
+		userAccountViewAll: function() {
+			return new Promise((resolve, reject) => {
+				UserAccounts.find().exec((error, items) => {
+					if (error) {
+						return reject({ message: error.message });
+					}
+					if (items) {
+						return resolve(items);
+					} else {
+						return reject({ message: 'Unable to retrieve user account collection'});
+					}
+				});
+			})
 		}
 	}
 }

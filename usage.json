@@ -1,0 +1,554 @@
+{
+    "roles": [
+        {
+            "name": "VOLUNTEER",
+            "value": "VOLUNTEER",
+            "comment": null
+        },
+        {
+            "name": "LEADER",
+            "value": "LEADER",
+            "comment": null
+        },
+        {
+            "name": "COORDINATOR",
+            "value": "COORDINATOR",
+            "comment": null
+        },
+        {
+            "name": "ONSITE_MANAGER",
+            "value": "ONSITE_MANAGER",
+            "comment": null
+        },
+        {
+            "name": "ADMIN",
+            "value": "ADMIN",
+            "comment": null
+        },
+        {
+            "name": "DEVLEAD",
+            "value": "DEVLEAD",
+            "comment": null
+        }
+    ],
+    "claims": [
+        {
+            "name": "OU: Volunteer",
+            "value": "Volunteer",
+            "claim": "{\"type\":\"OU\", \"value\":\"Volunteer\"}",
+            "comment": null
+        },
+        {
+            "name": "OU: Marketing",
+            "value": "Marketing",
+            "claim": "{\"type\":\"OU\", \"value\":\"Marketing\"}",
+            "comment": null
+        },
+        {
+            "name": "OU: DevLead",
+            "value": "DevLead",
+            "claim": "{\"type\":\"OU\", \"value\":\"DevLead\"}",
+            "comment": "TEST ONLY: Any user with this claim will be able to bypass all claim check."
+        },
+        {
+            "name": "TASKS: UserProfileReadAll",
+            "value": "UserProfileReadAll",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"UserProfileReadAll\"}",
+            "comment": "Allow user to read all personnel profiles"
+        },
+        {
+            "name": "TASKS: UserProfileWrite",
+            "value": "UserProfileWrite",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"UserProfileWrite\"}",
+            "comment": "Allow user to edit/remove all personnel profiles"
+        },
+        {
+            "name": "TASKS: UserAccountReadAll",
+            "value": "UserAccountReadAll",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"UserAccountReadAll\"}",
+            "comment": "All user to view all user-accounts"
+        },
+        {
+            "name": "TASKS: UserAccountWrite",
+            "value": "UserAccountWrite",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"UserAccountWrite\"}",
+            "comment": "Allow user to edit/remove all user accounts"
+        },
+        {
+            "name": "TASKS: LocaleInfoView",
+            "value": "LocaleInfoView",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"LocaleInfoView\"}",
+            "comment": null
+        },
+        {
+            "name": "TASKS: MessageSend",
+            "value": "MessageSend",
+            "claim": "{\"type\":\"TASKS\", \"value\":\"MessageSend\"}",
+            "comment": null
+        }
+    ],
+    "routes": [
+        {
+            "name": "/api/useraccounts/allusers",
+            "claim": [
+                {
+                    "Tasks": "UserAccountReadAll"
+                }
+            ],
+            "type": "get",
+            "auth": true,
+            "params": null,
+            "body": null,
+            "return": {
+                "200": "packaged array of user-account objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "TEST ONLY: retrieve/view all user-accounts."
+        },
+        {
+            "name": "/api/useraccounts/login",
+            "claim": null,
+            "type": "post",
+            "auth": false,
+            "params": null,
+            "body": {
+                "userName": "email of user",
+                "password": "user password"
+            },
+            "return": {
+                "200": {
+                    "message": "success message",
+                    "token": "JWT authorization token"
+                },
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/useraccounts/create",
+            "claim": null,
+            "type": "post",
+            "auth": false,
+            "params": null,
+            "body": {
+                "userName": "email of user",
+                "password": "user password",
+                "passwordConfirm": "user password same as above",
+                "roles": [
+                    "array of string of pre-set roles"
+                ],
+                "claims": [
+                    "array of claim objects"
+                ],
+                "fullName": "OPTIONAL: user full name"
+            },
+            "return": {
+                "200": {
+                    "message": "success message"
+                },
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/useraccounts/activate",
+            "claim": null,
+            "type": "put",
+            "auth": null,
+            "params": null,
+            "body": null,
+            "return": null,
+            "comment": "Unimplemented feature, unsure of purpose yet"
+        },
+        {
+            "name": "/api/useraccounts/passwordchange",
+            "claim": null,
+            "type": "put",
+            "auth": true,
+            "params": null,
+            "body": {
+                "userName": "email of user",
+                "password": "user password",
+                "passwordConfirm": "user password same as above"
+            },
+            "return": {
+                "200": {
+                    "message": "success message"
+                },
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/useraccounts/addclaims",
+            "claim": [
+                {
+                    "Tasks": "UserAccountWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": null,
+            "body": {
+                "userName": "email of user",
+                "claims": [
+                    "array of claim objects"
+                ]
+            },
+            "return": {
+                "200": {
+                    "message": "success message"
+                },
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Used to add new claim to existing user claims"
+        },
+        {
+            "name": "/api/useraccounts/resetclaims",
+            "claim": [
+                {
+                    "Tasks": "UserAccountWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": null,
+            "body": {
+                "userName": "email of user",
+                "claims": [
+                    "array of claim objects"
+                ]
+            },
+            "return": {
+                "200": {
+                    "message": "success message"
+                },
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Used to replace existing user claims with given claims"
+        },
+        {
+            "name": "/api/content/",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": null,
+            "body": null,
+            "return": {
+                "200": "packaged array of content objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns different set of content for authorized users and unauthoried users"
+        },
+        {
+            "name": "/api/content/filter/:serializedQuery",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": {
+                "serializedQuery": "Base64 String representation of query json"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged array of content objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns different set of content for authorized users and unauthoried users"
+        },
+        {
+            "name": "/api/content/:id",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged single content object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": ""
+        },
+        {
+            "name": "/api/content/add",
+            "claim": [
+                {
+                    "Tasks": "ContentWrite"
+                }
+            ],
+            "type": "post",
+            "auth": true,
+            "params": null,
+            "body": "a content object",
+            "return": {
+                "200": "packaged single content object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns the newly created content object"
+        },
+        {
+            "name": "/api/content/edit/:id",
+            "claim": [
+                {
+                    "Tasks": "ContentWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": "a content object",
+            "return": {
+                "200": "packaged single content object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns the updated content object"
+        },
+        {
+            "name": "/api/content/delete/:id",
+            "claim": [
+                {
+                    "Tasks": "ContentWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": "404 and error message if request failed, 204 otherwise",
+            "comment": null
+        },
+        {
+            "name": "/api/personnel/",
+            "claim": null,
+            "type": "get",
+            "auth": true,
+            "params": null,
+            "body": null,
+            "return": {
+                "200": "packaged array of personnel objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/personnel/filter/:serializedQuery",
+            "claim": null,
+            "type": "get",
+            "auth": true,
+            "params": {
+                "serializedQuery": "Base64 String representation of query json"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged array of personnel objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/personnel/:id",
+            "claim": null,
+            "type": "get",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged single personnel object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/personnel/add",
+            "claim": [
+                {
+                    "Tasks": "UserProfileWrite"
+                }
+            ],
+            "type": "post",
+            "auth": true,
+            "params": null,
+            "body": "a personnel object",
+            "return": {
+                "200": "packaged single personnel object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns the newly created announcement object"
+        },
+        {
+            "name": "/api/personnel/edit/:id",
+            "claim": [
+                {
+                    "Tasks": "UserProfileWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": "a personnel object",
+            "return": {
+                "200": "packaged single personnel object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns updated personnel object"
+        },
+        {
+            "name": "/api/personnel/deactivate/:id",
+            "claim": null,
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": "404 and error message if request failed, 204 otherwise",
+            "comment": null
+        },
+        {
+            "name": "/api/announcement/active",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": null,
+            "body": null,
+            "return": {
+                "200": "packaged array of announcement objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/announcement/filter/:serializedQuery",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": {
+                "serializedQuery": "Base64 String representation of query json"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged array of announcement objects",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/announcement/:id",
+            "claim": null,
+            "type": "get",
+            "auth": "both",
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": {
+                "200": "packaged single announcement object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": null
+        },
+        {
+            "name": "/api/announcement/add",
+            "claim": [
+                {
+                    "Tasks": "AnnouncementWrite"
+                }
+            ],
+            "type": "post",
+            "auth": true,
+            "params": null,
+            "body": "an announcement object",
+            "return": {
+                "200": "packaged single announcement object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns the newly created announcement object"
+        },
+        {
+            "name": "/api/announcement/edit/:id",
+            "claim": [
+                {
+                    "Tasks": "AnnouncementWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": "an announcement object",
+            "return": {
+                "200": "packaged single announcement object",
+                "400": {
+                    "message": "error message"
+                }
+            },
+            "comment": "Returns the updated announcement object"
+        },
+        {
+            "name": "/api/announcement/delete/:id",
+            "claim": [
+                {
+                    "Tasks": "AnnouncementWrite"
+                }
+            ],
+            "type": "put",
+            "auth": true,
+            "params": {
+                "id": "mongo generated _id"
+            },
+            "body": null,
+            "return": "404 and error message if request failed, 204 otherwise",
+            "comment": null
+        }
+    ]
+}

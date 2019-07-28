@@ -1,8 +1,18 @@
 var passport = require('passport');
 const utils = require('../util');
 
+// Checks if incoming Authorization token is valid
+// Will respond Unauthorized if token is invalid
 let auth_guard = passport.authenticate('jwt', { session: false });
 
+/**
+ * Checks if incoming request contains an Authorization token
+ * Yes:
+ *  conitnue to validate Authorization token,
+ *  respond with Unauthorized if token is invalid
+ * No:
+ *  continue as un-authorized user
+ */
 let protective_guard = function(req, res, next) {
     if (req.headers.authorization)
         passport.authenticate('jwt', { session: false })(req, res, next);
@@ -10,63 +20,43 @@ let protective_guard = function(req, res, next) {
         next();
 };
 
-// TODO: improve this generalized claim guard
-// this need business logic consideration for conditions
+/**
+ * Check claims owned by user against claims required by route
+ * 
+ */
 let claim_guard = function(req, res, next) {
-    // When protective_guard passin a non-user
+    // req.user is only undefined when request does not include authorization token
+    // content available to unauthorized user is limited and will be limited by corresponding routes
     if (req.user === undefined || req.user === null) {
         next();
         return;
     }
 
-    // When protective_guard / auth_guard passin a good-user
+    // upon receiving an authorized user
     let path = req.baseUrl + req.route.path;
-    let allowedRoles = utils.FULL_PATHS[path].ROLES;
     let allowedClaims = utils.FULL_PATHS[path].CLAIMS;
-
-    let userRoles = req.user.roles;
     let userClaims = req.user.claims;
-
-    // console.log('Allow claims');
-    // console.log(allowedClaims);
-    // console.log('Allow roles');
-    // console.log(allowedRoles);
-
-    // console.log('User claims');
-    // console.log(userClaims);
-    // console.log('User roles');
-    // console.log(userRoles);
-
-    let userProcessAllRoles = true;
     let userProcessAllClaims = true;
+
+    console.log(userClaims);
+
+    // allow { 'OU': 'DevLead' } to bypass all claims check
+    if (userClaims.findIndex(claim => claim.type === utils.CLAIMS.TYPES.OU && claim.value === utils.CLAIMS.OU.DevLead) != -1) {
+        next();
+        return;
+    }
 
     for (var i = 0, l = allowedClaims.length; i < l; i++) {
         if (userClaims.findIndex(claim => claim.type === allowedClaims[i].type && claim.value === allowedClaims[i].value) == -1)
             userProcessAllClaims = false;
     }
-
-    for (var i = 0, l = allowedRoles.length; i < l; i++) {
-        if (userRoles.findIndex(role => role === allowedRoles[i]) == -1)
-            userProcessAllRoles = false;
-    }
-
-    // console.log("User has all claim");
-    // console.log(userProcessAllClaims);
-    // console.log("User has all role");
-    // console.log(userProcessAllRoles);
-
-    if (allowedRoles.length == 0 && allowedClaims.length == 0) {
+    
+    if (userProcessAllClaims) {
         next();
         return;
-    } else if (allowedRoles.length == 0) {
-        if (userProcessAllClaims) { next(); return; }
-    } else if (allowedClaims.length == 0) {
-        if (userProcessAllRoles) { next(); return; }
     } else {
-        if (userProcessAllClaims && userProcessAllRoles) { next(); return; }
+        res.status(401).json({message:'User does not process valid claims'});
     }
-
-    res.status(401).json({message:'User does not process valid claims or roles'});
 
 }
 
