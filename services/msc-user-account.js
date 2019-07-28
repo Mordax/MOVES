@@ -26,14 +26,14 @@ module.exports = function () {
 				}
 
 				// User need to have at least 1 role and they all have to be one of pre-defined roles
-				let roles = utils.ROLES.values();
+				let roles = Object.values(utils.ROLES);
 
 				if (userData.roles.length == 0) {
 					return reject('User need to have at least 1 role.');
 				}
 
 				for (var i = 0, len = userData.roles.length; i < len; i++) {
-					if (!roles.include(userData.roles[i])) {
+					if (!roles.includes(userData.roles[i])) {
 						return reject(`Role ${userData.roles[i]} is not supported`);
 					}
 				}
