@@ -1,8 +1,8 @@
-#MO:VES backend
+# MO:VES backend
 
 This project serves as the backend for the MO:VES project for the DPS945 Spring 2019 for ICVA client.
 
-This backend is currently deployed on [Heroku](https://moves-backend-a.herokuapp.com)
+This backend is currently deployed on [Heroku](https://moves-backend-a.herokuapp.com). Click [usage](https://moves-backend-a.herokuapp.com) to view usages of routes, please update if some of them does not make any sense, and feel free to add comments thru the usage.json file
 
 The main schemas we will be working with are 
 
